@@ -1,0 +1,385 @@
+openapi: 3.0.0
+info:
+  title: My API
+  description: This is the documentation for my API
+  version: 1.0.0
+servers:
+  - url: http://api.example.com/v1
+paths:
+  /api/admin/stats:
+    get:
+      summary: Get statistics for the application
+      description: Retrieves the number of users and notes for the admin user.
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    description: Indicates if the request was successful.
+                  numberOfUsers:
+                    type: integer
+                    description: The number of users in the system.
+                  numberOfNotes:
+                    type: integer
+                    description: The number of notes in the system.
+  /api/user/logins:
+    get:
+      summary: Get user's login history 
+      description: Retrieves the login history of a specific user for admin purposes.
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    description: Indicates if the request was successful.
+                  logins:
+                    type: array
+                    description: List of user's login history.
+                    items:
+                      type: object
+                      properties:
+                        username:
+                          type: string
+                          description: The username of the user.
+                        date:
+                          type: string
+                          description: The date and time of the login.
+                        success:
+                          type: string
+                          description: Indicates if the login was successful.
+                          enum: ["YES", "NO"]
+  /api/user/signup:
+    post:
+      summary: User sign up
+      description: Creates a new user account.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  description: The username of the user.
+                password:
+                  type: string
+                  description: The password of the user.
+              required:
+                - username
+                - password
+      responses:
+        "200":
+          description: User signed up successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    description: Indicates if the request was successful.
+  /api/user/login:
+    post:
+      summary: User login
+      description: Authenticates a user and provides an access token.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  description: The username of the user.
+                password:
+                  type: string
+                  description: The password of the user.
+              required:
+                - username
+                - password
+      responses:
+        "200":
+          description: User logged in successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    description: Indicates if the request was successful.
+                  token:
+                    type: string
+                    description: Access token for the authenticated user.
+                  userId:
+                    type: string
+                    description: The ID of the authenticated user.
+  /api/user/logins:
+    get:
+      summary: Get user's login history
+      description: Retrieves the login history of the authenticated user.
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    description: Indicates if the request was successful.
+                  logins:
+                    type: array
+                    description: List of user's login history.
+                    items:
+                      type: object
+                      properties:
+                        date:
+                          type: string
+                          description: The date and time of the login.
+                        success:
+                          type: string
+                          description: Indicates if the login was successful.
+                          enum: ["YES", "NO"]
+  /api/notes:
+    post:
+      summary: Create a new note
+      description: Creates a new note for the authenticated user.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  description: The title of the note.
+                text:
+                  type: string
+                  description: The text content of the note.
+              required:
+                - title
+                - text
+      responses:
+        "201":
+          description: Note created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    description: Indicates if the request was successful.
+                  message:
+                    type: string
+                    description: A message indicating the status of the operation.
+                  noteId:
+                    type: string
+                    description: The ID of the newly created note.
+    get:
+      summary: Get user's notes
+      description: Retrieves all notes belonging to the authenticated user.
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    description: Indicates if the request was successful.
+                  notes:
+                    type: array
+                    description: List of user's notes.
+                    items:
+                      type: object
+                      properties:
+                        createdAt:
+                          type: string
+                          description: The date and time the note was created.
+                        modifiedAt:
+                          type: string
+                          description: The date and time the note was last modified.
+                        title:
+                          type: string
+                          description: The title of the note.
+                        text:
+                          type: string
+                          description: The text content of the note.
+  /api/notes/{noteId}:
+    put:
+      summary: Update a note
+      description: Updates the specified note belonging to the authenticated user.
+      parameters:
+        - name: noteId
+          in: path
+          required: true
+          description: The ID of the note to be updated.
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  description: The new title of the note.
+                text:
+                  type: string
+                  description: The new text content of the note.
+              required:
+                - title
+                - text
+      responses:
+        "200":
+          description: Note updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    description: Indicates if the request was successful.
+                  message:
+                    type: string
+                    description: A message indicating the status of the operation.
+    
+    delete: 
+      summary: Delete a note
+      description: Deletes the specified note belonging to the authenticated user.
+      parameters:
+        - name: noteId
+          in: path
+          required: true
+          description: The ID of the note to be deleted.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Note deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    description: Indicates if the request was successful.
+                  message:
+                    type: string
+                    description: A message indicating the status of the operation.
+        "404":
+          description: Note not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    description: Indicates if the request was successful.
+                  message:
+                    type: string
+                    description: A message indicating that the note was not found.
+        "403":
+          description: Unauthorized to delete this note
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    description: Indicates if the request was successful.
+                  message:
+                    type: string
+                    description: A message indicating that the user is unauthorized to delete this note.
+        "500":
+          description: Failed to delete note
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    description: Indicates if the request was successful.
+                  message:
+                    type: string
+                    description: A message indicating that the note deletion failed.
+                      /api/notes/search/{searchTitle}:
+    get:
+      summary: Search notes by title
+      description: Searches notes by title for the authenticated user.
+      parameters:
+        - name: searchTitle
+          in: path
+          required: true
+          description: The title to search for.
+          schema:
+            type: string
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    description: Indicates if the request was successful.
+                  notes:
+                    type: array
+                    description: List of notes matching the search criteria.
+                    items:
+                      type: object
+                      properties:
+                        date:
+                          type: string
+                          description: The date the note was created.
+                        title:
+                          type: string
+                          description: The title of the note.
+                        text:
+                          type: string
+                          description: The text content of the note.
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    description: Indicates if the request was successful.
+                  message:
+                    type: string
+                    description: A message indicating that an internal server error occurred.
+
